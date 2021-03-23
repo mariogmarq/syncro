@@ -36,7 +36,7 @@ pub struct Syncro {
 }
 
 impl Syncro {
-    pub fn subcommand(&self) -> Command {
-        return self.sub;
+    pub fn subcommand(&self) -> &Command {
+        return &self.sub;
     }
 }

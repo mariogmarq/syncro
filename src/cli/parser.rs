@@ -1,3 +1,5 @@
+// Implements a command line parser through structopt
+
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, PartialEq)]
@@ -34,14 +36,7 @@ pub struct Syncro {
 }
 
 impl Syncro {
-    //Only function of Syncro, match each command with his own handler
-    pub fn command(&self) {
-        match &self.sub {
-            Command::Add { files } => {}
-            Command::Init => {}
-            Command::Update => {}
-            Command::Delete { files } => {}
-            Command::Restore => {}
-        }
+    pub fn subcommand(&self) -> Command {
+        return self.sub;
     }
 }

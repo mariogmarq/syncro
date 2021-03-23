@@ -7,14 +7,14 @@ pub enum Command {
     /// Add a file to the current copy, you must be in a started copy
     Add {
         #[structopt(parse(from_os_str))]
-        filename: std::path::PathBuf,
+        files: Vec<std::path::PathBuf>,
     },
     /// Syncronizes the copy
     Update,
     /// Deletes a file from the current copy
     Delete {
         #[structopt(parse(from_os_str))]
-        filename: std::path::PathBuf,
+        files: Vec<std::path::PathBuf>,
     },
     /// Sustitutes/Creates files based on the copy's ones
     Restore,
@@ -37,10 +37,10 @@ impl Syncro {
     //Only function of Syncro, match each command with his own handler
     pub fn command(&self) {
         match &self.sub {
-            Command::Add { filename } => {}
+            Command::Add { files } => {}
             Command::Init => {}
             Command::Update => {}
-            Command::Delete { filename } => {}
+            Command::Delete { files } => {}
             Command::Restore => {}
         }
     }

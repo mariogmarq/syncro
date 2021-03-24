@@ -4,11 +4,11 @@ mod config;
 mod parser;
 use structopt::StructOpt;
 
-// Wrapper for config and parser
+/// Wrapper for config and parser
 pub struct Cli {
-    //Parser
+    /// Parser
     parser: parser::Syncro,
-    //Config
+    /// Config
     config: config::Config,
 }
 
@@ -20,7 +20,7 @@ impl Cli {
         Cli { parser, config }
     }
 
-    //Only function of Syncro, match each command with his own handler
+    /// Only function of Syncro, match each command with his own handler
     pub fn command(&self) {
         match &self.parser.subcommand() {
             parser::Command::Add { files } => {}

@@ -1,10 +1,10 @@
 use std::fs::DirEntry;
 use std::io::BufRead;
 
-// name of the config file
+/// name of the config file
 const CONFIG_FILE_NAME: &str = ".syncro";
 
-// Implements a way to save the configuration of a project with syncro
+/// Implements a way to save the configuration of a project with syncro
 pub struct Config {
     files: Vec<String>,
 }
@@ -16,10 +16,8 @@ impl Config {
 
     //TODO: Implement a way to write, read and find configuration files
 
-    // Reads the configuration file in the given path
-    pub fn read_from_path(&mut self, path: &std::path::PathBuf) {
-        let mut file = path.clone();
-        file.push(CONFIG_FILE_NAME);
+    /// Reads the configuration file in the given path, must include the name
+    pub fn read_from_path(&mut self, file: &std::path::PathBuf) {
         if !file.exists() || file.is_dir() {
             //TODO: Implement error handling, maybe with nice reporting :)
         }
@@ -46,7 +44,8 @@ impl Config {
         }
     }
 
-    // Creates the configuration file in the given path
+    /// Creates the configuration file in the given path, doesn't have to include the config file
+    /// name(optional)
     fn create_in_path(path: &std::path::PathBuf) -> std::io::Result<()> {
         // Comprobation of folder
         let mut true_path = std::path::PathBuf::new();
@@ -67,8 +66,7 @@ impl Config {
         Ok(())
     }
 
-    // Finds the configuration file either in the local folder on an upper one
-    // //TODO: testing
+    /// Finds the configuration file either in the local folder on an upper one
     fn find_folder() -> Option<std::path::PathBuf> {
         // Folder where we are searching
         let mut folder = std::path::PathBuf::new();

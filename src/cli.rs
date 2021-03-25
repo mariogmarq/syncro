@@ -1,7 +1,7 @@
 // Implements a wrapper for both the argument parser and the configuration and create the commands
-
-mod config;
+pub mod config;
 mod parser;
+use super::commands;
 use structopt::StructOpt;
 
 /// Wrapper for config and parser
@@ -24,7 +24,7 @@ impl Cli {
     pub fn command(&self) {
         match &self.parser.subcommand() {
             parser::Command::Add { files } => {}
-            parser::Command::Init => {}
+            parser::Command::Init => commands::init(),
             parser::Command::Update => {}
             parser::Command::Delete { files } => {}
             parser::Command::Restore => {}

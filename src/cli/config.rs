@@ -1,5 +1,5 @@
-use std::fs::DirEntry;
 use std::io::BufRead;
+use std::io::Write;
 
 /// name of the config file
 const CONFIG_FILE_NAME: &str = ".syncro";
@@ -13,8 +13,6 @@ impl Config {
     pub fn new() -> Config {
         Config { files: vec![] }
     }
-
-    //TODO: Implement a way to write, read and find configuration files
 
     /// Reads the configuration file in the given path, must include the name
     pub fn read_from_path(&mut self, file: &std::path::PathBuf) {
@@ -46,7 +44,9 @@ impl Config {
 
     /// Creates the configuration file in the given path, doesn't have to include the config file
     /// name(optional)
-    fn create_in_path(path: &std::path::PathBuf) -> std::io::Result<()> {
+    pub fn create_in_path(
+        path: &std::path::PathBuf,
+    ) -> std::result::Result<std::fs::File, std::io::Error> {
         // Comprobation of folder
         let mut true_path = std::path::PathBuf::new();
         if !path.is_dir() {
@@ -59,15 +59,14 @@ impl Config {
         // The file path
         true_path.push(CONFIG_FILE_NAME);
 
-        //Create file and write
-        std::fs::File::create(true_path)?;
-
-        //Return
-        Ok(())
+        //Create file, open it and return it
+        std::fs::File::create(true_path.clone())?;
+        let file = std::fs::File::open(true_path)?;
+        Ok(file)
     }
 
     /// Finds the configuration file either in the local folder on an upper one
-    fn find_folder() -> Option<std::path::PathBuf> {
+    pub fn find_folder() -> Option<std::path::PathBuf> {
         // Folder where we are searching
         let mut folder = std::path::PathBuf::new();
         folder.push(".");
@@ -99,5 +98,18 @@ impl Config {
 
         //No file have been found
         None
+    }
+
+    /// Write the configuration into the file
+    pub fn write(&self, config_file: std::fs::File) -> std::io::Result<()> {
+        let mut writer = std::io::BufWriter::new(config_file);
+
+        for value in &self.files {
+            let value = value.as_bytes();
+            writer.write(value)?;
+            writer.write(&['\n' as u8])?;
+        }
+
+        Ok(())
     }
 }

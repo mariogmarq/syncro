@@ -21,9 +21,9 @@ impl Cli {
     }
 
     /// Only function of Syncro, match each command with his own handler
-    pub fn command(&self) {
+    pub fn command(&mut self) {
         match &self.parser.subcommand() {
-            parser::Command::Add { files } => {}
+            parser::Command::Add { files } => commands::add(files, &mut self.config),
             parser::Command::Init => commands::init(),
             parser::Command::Update => {}
             parser::Command::Delete { files } => {}

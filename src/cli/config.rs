@@ -1,5 +1,6 @@
 use std::io::BufRead;
 use std::io::Write;
+use std::str::FromStr;
 
 /// name of the config file
 const CONFIG_FILE_NAME: &str = ".syncro";
@@ -111,5 +112,28 @@ impl Config {
         }
 
         Ok(())
+    }
+
+    /// Loads the configuration
+    pub fn load(&mut self) {
+        //TODO: error handling
+        self.files.clear();
+
+        match Config::find_folder() {
+            Some(file) => self.read_from_path(&file),
+            None => {}
+        }
+    }
+
+    /// Adds a path into the configuration
+    // if it exists does nothing
+    pub fn add(&mut self, path: &std::path::PathBuf) {
+        let path = std::fs::canonicalize(path).expect("Couldn't resolve path");
+        let path = path.to_str().expect("A valid path");
+        let path = String::from_str(path).expect("A valid path");
+        match self.files.binary_search(&path) {
+            Ok(_) => {}
+            Err(index) => self.files.insert(index, path),
+        }
     }
 }

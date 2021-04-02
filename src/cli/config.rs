@@ -1,6 +1,6 @@
 use std::fs::OpenOptions;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::{fs, io::BufRead};
 
@@ -23,7 +23,7 @@ impl Config {
 
     /// Reads the configuration file in the given path, must include the name
     /// Calling this function will store the path into the config struct
-    pub fn read_from_path(&mut self, file: &std::path::PathBuf) {
+    pub fn read_from_path(&mut self, file: &PathBuf) {
         if !file.exists() || file.is_dir() {
             //TODO: Implement error handling, maybe with nice reporting :)
         }
@@ -55,7 +55,7 @@ impl Config {
     /// name(optional)
     pub fn create_in_path(path: &PathBuf) -> std::result::Result<std::fs::File, std::io::Error> {
         // Comprobation of folder
-        let mut true_path = std::path::PathBuf::new();
+        let mut true_path = PathBuf::new();
         if !path.is_dir() {
             // if is not a dir, we go to the parent dir
             true_path = path.parent().unwrap().to_path_buf();
@@ -75,12 +75,12 @@ impl Config {
     /// Finds the configuration file either in the local folder on an upper one
     pub fn find_folder() -> Option<PathBuf> {
         // Folder where we are searching
-        let mut folder = std::path::PathBuf::new();
+        let mut folder = PathBuf::new();
         folder.push(".");
 
         loop {
             //If current dir is root, we break
-            if folder.as_path() == std::path::Path::new("/") {
+            if folder.as_path() == Path::new("/") {
                 break;
             }
 
@@ -128,8 +128,8 @@ impl Config {
 
         for value in &self.files {
             match writer.write(value.as_bytes()) {
-                Ok(i) => println!("written {}", i),
-                Err(e) => eprintln!("{}", e),
+                Err(e) => eprintln!("ERROR: {}", e),
+                Ok(_) => {}
             }
         }
 
@@ -149,7 +149,7 @@ impl Config {
 
     /// Adds a path into the configuration
     // if it exists does nothing
-    pub fn add(&mut self, path: &std::path::PathBuf) {
+    pub fn add(&mut self, path: &PathBuf) {
         let path = std::fs::canonicalize(path).expect("Couldn't resolve path");
         let path = path.to_str().expect("A valid path");
         let path = String::from_str(path).expect("A valid path");
@@ -157,5 +157,20 @@ impl Config {
             Ok(_) => {}
             Err(index) => self.files.insert(index, path),
         }
+    }
+
+    /// Delete a file from the configuration
+    pub fn delete(&mut self, path: &PathBuf) {
+        let index = self
+            .files
+            .iter()
+            .position(|x| Path::new(&x) == path.as_path());
+
+        match index {
+            None => {}
+            Some(i) => {
+                self.files.remove(i);
+            }
+        };
     }
 }

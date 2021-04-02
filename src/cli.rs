@@ -26,7 +26,7 @@ impl Cli {
             parser::Command::Add { files } => commands::add(files, &mut self.config),
             parser::Command::Init => commands::init(),
             parser::Command::Update => {}
-            parser::Command::Delete { files } => {}
+            parser::Command::Delete { files } => commands::delete(files, &mut self.config),
             parser::Command::Restore => {}
         }
     }

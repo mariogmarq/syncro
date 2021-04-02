@@ -1,6 +1,8 @@
-use std::io::BufRead;
+use std::fs::OpenOptions;
 use std::io::Write;
+use std::path::PathBuf;
 use std::str::FromStr;
+use std::{fs, io::BufRead};
 
 /// name of the config file
 const CONFIG_FILE_NAME: &str = ".syncro";
@@ -8,20 +10,26 @@ const CONFIG_FILE_NAME: &str = ".syncro";
 /// Implements a way to save the configuration of a project with syncro
 pub struct Config {
     files: Vec<String>,
+    path: Option<std::path::PathBuf>,
 }
 
 impl Config {
     pub fn new() -> Config {
-        Config { files: vec![] }
+        Config {
+            files: vec![],
+            path: None,
+        }
     }
 
     /// Reads the configuration file in the given path, must include the name
+    /// Calling this function will store the path into the config struct
     pub fn read_from_path(&mut self, file: &std::path::PathBuf) {
         if !file.exists() || file.is_dir() {
             //TODO: Implement error handling, maybe with nice reporting :)
         }
 
         //Since file exists, we read it
+        self.path = Some(fs::canonicalize(file.clone()).expect("No valid config file"));
         let file = std::fs::File::open(file.as_path()).unwrap();
         let mut reader = std::io::BufReader::new(file);
         let mut line = String::new();
@@ -45,9 +53,7 @@ impl Config {
 
     /// Creates the configuration file in the given path, doesn't have to include the config file
     /// name(optional)
-    pub fn create_in_path(
-        path: &std::path::PathBuf,
-    ) -> std::result::Result<std::fs::File, std::io::Error> {
+    pub fn create_in_path(path: &PathBuf) -> std::result::Result<std::fs::File, std::io::Error> {
         // Comprobation of folder
         let mut true_path = std::path::PathBuf::new();
         if !path.is_dir() {
@@ -67,7 +73,7 @@ impl Config {
     }
 
     /// Finds the configuration file either in the local folder on an upper one
-    pub fn find_folder() -> Option<std::path::PathBuf> {
+    pub fn find_folder() -> Option<PathBuf> {
         // Folder where we are searching
         let mut folder = std::path::PathBuf::new();
         folder.push(".");
@@ -102,13 +108,29 @@ impl Config {
     }
 
     /// Write the configuration into the file
-    pub fn write(&self, config_file: std::fs::File) -> std::io::Result<()> {
-        let mut writer = std::io::BufWriter::new(config_file);
+    /// Option requiered if path field is None
+    pub fn write(&self, mut config_file: Option<std::fs::File>) -> std::io::Result<()> {
+        //Change open options for write
+
+        match &self.path {
+            Some(path) => {
+                config_file = Some(
+                    OpenOptions::new()
+                        .write(true)
+                        .open(path.as_path())
+                        .expect("Couldn't open the file"),
+                )
+            }
+            None => {}
+        }
+
+        let mut writer = std::io::BufWriter::new(config_file.expect("No file specified"));
 
         for value in &self.files {
-            let value = value.as_bytes();
-            writer.write(value)?;
-            writer.write(&['\n' as u8])?;
+            match writer.write(value.as_bytes()) {
+                Ok(i) => println!("written {}", i),
+                Err(e) => eprintln!("{}", e),
+            }
         }
 
         Ok(())

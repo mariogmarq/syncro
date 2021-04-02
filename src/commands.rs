@@ -9,5 +9,8 @@ pub fn init() {
 }
 
 pub fn add(files: &Vec<std::path::PathBuf>, cfg: &mut super::cli::config::Config) {
-    add::add(files, cfg);
+    match add::add(files, cfg) {
+        Ok(_) => {}
+        Err(e) => println!("ERROR: {}", e),
+    }
 }

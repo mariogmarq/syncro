@@ -131,6 +131,7 @@ impl Config {
                 Err(e) => eprintln!("ERROR: {}", e),
                 Ok(_) => {}
             }
+            writer.write(b"\n").expect("ERROR writing");
         }
 
         Ok(())

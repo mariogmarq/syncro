@@ -25,7 +25,7 @@ impl Cli {
         match &self.parser.subcommand() {
             parser::Command::Add { files } => commands::add(files, &mut self.config),
             parser::Command::Init => commands::init(),
-            parser::Command::Update => {}
+            parser::Command::Update => commands::update(&mut self.config),
             parser::Command::Delete { files } => commands::delete(files, &mut self.config),
             parser::Command::Restore => {}
         }

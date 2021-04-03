@@ -185,4 +185,17 @@ impl Config {
             }
         };
     }
+
+    /// Returns a copy of the files that stores config
+    pub fn files(&self) -> Vec<String> {
+        self.files.clone()
+    }
+
+    /// Return the folder where the config file is, needs to be loaded before
+    pub fn working_folder(&self) -> Option<PathBuf> {
+        match &self.path {
+            None => None,
+            Some(p) => Some(p.parent().expect("Error in config file").to_path_buf()),
+        }
+    }
 }

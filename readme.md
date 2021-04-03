@@ -9,7 +9,7 @@ Maybe it will be also useful if you want to automatically create security copies
 diferent disks.
 
 # Is it ready to be used?
-No.
+YES!! Syncro can be used from now on!
 
 # How to build
 Since is a rust application you will just need to have rust and cargo installed and run the
@@ -18,5 +18,22 @@ following command.
 ```
 cargo build --release
 ```
+or for installing it
+```
+cargo install --path .
+```
 
-
+# How it works
+First you need a directory where store the copies, one you have it run
+```
+syncro init
+```
+Then start tracking files with
+```
+syncro add <files>
+```
+Files can either be files or directories.
+Finally, syncronize with
+```
+syncro update
+```

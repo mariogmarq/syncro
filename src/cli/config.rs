@@ -118,7 +118,7 @@ impl Config {
 
     /// Write the configuration into the file
     /// Option requiered if path field is None
-    pub fn write(&self, mut config_file: Option<std::fs::File>) -> std::io::Result<()> {
+    pub fn write(&self, mut config_file: Option<std::fs::File>) {
         //Change open options for write
 
         match &self.path {
@@ -134,7 +134,7 @@ impl Config {
             None => {}
         }
 
-        let mut writer = std::io::BufWriter::new(config_file.expect("No file specified"));
+        let mut writer = std::io::BufWriter::new(config_file.expect("No config file found"));
 
         for value in &self.files {
             let mut value = value.clone();
@@ -144,8 +144,6 @@ impl Config {
                 Ok(_) => {}
             }
         }
-
-        Ok(())
     }
 
     /// Loads the configuration
@@ -159,7 +157,6 @@ impl Config {
                 std::process::exit(1);
             }
         }
-        println!("{:?}", &self.files);
     }
 
     /// Adds a path into the configuration

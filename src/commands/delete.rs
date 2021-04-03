@@ -7,5 +7,5 @@ pub fn delete(files: &Vec<PathBuf>, cfg: &mut Config) {
         cfg.delete(file);
     }
 
-    cfg.write(None).expect("Error writing");
+    cfg.write(None);
 }

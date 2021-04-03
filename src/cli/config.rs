@@ -1,4 +1,5 @@
 use std::fs::OpenOptions;
+use std::io;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
@@ -23,9 +24,9 @@ impl Config {
 
     /// Reads the configuration file in the given path, must include the name
     /// Calling this function will store the path into the config struct
-    pub fn read_from_path(&mut self, file: &PathBuf) {
+    pub fn read_from_path(&mut self, file: &PathBuf) -> std::result::Result<(), io::Error> {
         if !file.exists() || file.is_dir() {
-            //TODO: Implement error handling, maybe with nice reporting :)
+            return Err(io::Error::new(io::ErrorKind::Other, "Not a regular file"));
         }
 
         //Since file exists, we read it
@@ -45,10 +46,14 @@ impl Config {
                 }
 
                 Err(_) => {
-                    //Error handling
+                    return Err(io::Error::new(
+                        io::ErrorKind::Other,
+                        "Couldn't read from file",
+                    ))
                 }
             }
         }
+        Ok(())
     }
 
     /// Creates the configuration file in the given path, doesn't have to include the config file
@@ -139,12 +144,14 @@ impl Config {
 
     /// Loads the configuration
     pub fn load(&mut self) {
-        //TODO: error handling
         self.files.clear();
 
         match Config::find_folder() {
-            Some(file) => self.read_from_path(&file),
-            None => {}
+            Some(file) => self.read_from_path(&file).expect("Couldn't read the file"),
+            None => {
+                eprintln!("Cannot find .syncro file, did you ran syncro init?");
+                std::process::exit(1);
+            }
         }
     }
 

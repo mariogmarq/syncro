@@ -42,7 +42,11 @@ impl Config {
                         //EOF
                         break;
                     }
-                    self.files.push(line.clone());
+                    //readline inserts \n so we pop it
+                    if let Some(_) = line.pop() {
+                        self.files.push(line.clone());
+                    }
+                    line.clear();
                 }
 
                 Err(_) => {
@@ -122,6 +126,7 @@ impl Config {
                 config_file = Some(
                     OpenOptions::new()
                         .write(true)
+                        .truncate(true)
                         .open(path.as_path())
                         .expect("Couldn't open the file"),
                 )
@@ -132,11 +137,12 @@ impl Config {
         let mut writer = std::io::BufWriter::new(config_file.expect("No file specified"));
 
         for value in &self.files {
+            let mut value = value.clone();
+            value.push('\n');
             match writer.write(value.as_bytes()) {
                 Err(e) => eprintln!("ERROR: {}", e),
                 Ok(_) => {}
             }
-            writer.write(b"\n").expect("ERROR writing");
         }
 
         Ok(())
@@ -153,6 +159,7 @@ impl Config {
                 std::process::exit(1);
             }
         }
+        println!("{:?}", &self.files);
     }
 
     /// Adds a path into the configuration

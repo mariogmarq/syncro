@@ -18,8 +18,6 @@ pub enum Command {
         #[structopt(parse(from_os_str))]
         files: Vec<std::path::PathBuf>,
     },
-    /// Sustitutes/Creates files based on the copy's ones
-    Restore,
 }
 
 /// Syncro

@@ -15,7 +15,7 @@ YES!! Syncro can be used from now on!
 Since is a rust application you will just need to have rust and cargo [installed](https://doc.rust-lang.org/stable/book/ch01-01-installation.html) and run the
 following command.
 ```
-wget https://raw.githubusercontent.com/mariogmarq/syncro/main/install.sh | sh
+curl https://raw.githubusercontent.com/mariogmarq/syncro/main/install.sh | sh
 ```
 
 

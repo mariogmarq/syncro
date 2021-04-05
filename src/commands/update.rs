@@ -1,6 +1,7 @@
 use super::super::cli::config::Config;
 use std::fs;
 use std::io;
+use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::result::Result;
 
@@ -42,10 +43,14 @@ pub fn update(cfg: &mut Config) {
 /// It must be a dir, no comprobation of it is done here!!!
 // is what to be copied, and working_dir where
 fn handle_dir(path: PathBuf, working_dir: PathBuf) -> Result<(), io::Error> {
-    // Create a dir with the name in the working dir
+    // Create a dir with the name in the working dir if it exists
     let mut dirname = working_dir.clone();
     dirname.push(path.file_name().unwrap());
-    fs::create_dir(dirname.as_path())?;
+    if let Err(e) = fs::metadata(dirname.clone()) {
+        if e.kind() == ErrorKind::NotFound {
+            fs::create_dir(dirname.as_path())?;
+        }
+    }
 
     for entry in fs::read_dir(path.clone()).expect("Error reading folder") {
         let entry = entry?;
@@ -65,7 +70,9 @@ fn handle_dir(path: PathBuf, working_dir: PathBuf) -> Result<(), io::Error> {
 // path is the path of the file to be copied, working dir is where to be copied
 fn handle_file(path: PathBuf, mut working_dir: PathBuf) -> Result<(), io::Error> {
     working_dir.push(path.file_name().expect("Error copying file"));
+    //Working dir is now the name of the future file
     println!("Copying {} into {}", path.display(), working_dir.display());
     fs::copy(path, working_dir)?;
+
     Ok(())
 }

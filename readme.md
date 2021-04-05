@@ -12,16 +12,12 @@ diferent disks.
 YES!! Syncro can be used from now on!
 
 # How to build
-Since is a rust application you will just need to have rust and cargo installed and run the
+Since is a rust application you will just need to have rust and cargo [installed](https://doc.rust-lang.org/stable/book/ch01-01-installation.html) and run the
 following command.
+```
+wget https://raw.githubusercontent.com/mariogmarq/syncro/main/install.sh | sh
+```
 
-```
-cargo build --release
-```
-or for installing it
-```
-cargo install --path .
-```
 
 # How it works
 First you need a directory where store the copies, one you have it run

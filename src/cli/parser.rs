@@ -36,6 +36,6 @@ pub struct Syncro {
 impl Syncro {
     /// Return the subcommand
     pub fn subcommand(&self) -> &Command {
-        return &self.sub;
+        &self.sub
     }
 }

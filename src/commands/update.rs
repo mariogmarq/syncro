@@ -44,7 +44,7 @@ pub fn update(cfg: &mut Config) {
 // is what to be copied, and working_dir where
 fn handle_dir(path: PathBuf, working_dir: PathBuf) -> Result<(), io::Error> {
     // Create a dir with the name in the working dir if it exists
-    let mut dirname = working_dir.clone();
+    let mut dirname = working_dir;
     dirname.push(path.file_name().unwrap());
     if let Err(e) = fs::metadata(dirname.clone()) {
         if e.kind() == ErrorKind::NotFound {
@@ -52,7 +52,7 @@ fn handle_dir(path: PathBuf, working_dir: PathBuf) -> Result<(), io::Error> {
         }
     }
 
-    for entry in fs::read_dir(path.clone()).expect("Error reading folder") {
+    for entry in fs::read_dir(path).expect("Error reading folder") {
         let entry = entry?;
         match entry.path().is_dir() {
             true => {

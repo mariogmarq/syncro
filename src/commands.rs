@@ -3,6 +3,8 @@ mod delete;
 mod init;
 mod update;
 
+use std::path::PathBuf;
+
 pub fn init() {
     match init::init() {
         Ok(_) => {}
@@ -10,11 +12,11 @@ pub fn init() {
     }
 }
 
-pub fn add(files: &Vec<std::path::PathBuf>, cfg: &mut super::cli::config::Config) {
+pub fn add(files: &[PathBuf], cfg: &mut super::cli::config::Config) {
     add::add(files, cfg);
 }
 
-pub fn delete(files: &Vec<std::path::PathBuf>, cfg: &mut super::cli::config::Config) {
+pub fn delete(files: &[PathBuf], cfg: &mut super::cli::config::Config) {
     delete::delete(files, cfg);
 }
 

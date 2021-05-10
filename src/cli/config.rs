@@ -24,14 +24,14 @@ impl Config {
 
     /// Reads the configuration file in the given path, must include the name
     /// Calling this function will store the path into the config struct
-    pub fn read_from_path(&mut self, file: &PathBuf) -> std::result::Result<(), io::Error> {
+    pub fn read_from_path(&mut self, file: &Path) -> std::result::Result<(), io::Error> {
         if !file.exists() || file.is_dir() {
             return Err(io::Error::new(io::ErrorKind::Other, "Not a regular file"));
         }
 
         //Since file exists, we read it
-        self.path = Some(fs::canonicalize(file.clone()).expect("No valid config file"));
-        let file = std::fs::File::open(file.as_path()).unwrap();
+        self.path = Some(fs::canonicalize(file).expect("No valid config file"));
+        let file = std::fs::File::open(file).unwrap();
         let mut reader = std::io::BufReader::new(file);
         let mut line = String::new();
 
@@ -43,7 +43,7 @@ impl Config {
                         break;
                     }
                     //readline inserts \n so we pop it
-                    if let Some(_) = line.pop() {
+                    if line.pop().is_some() {
                         self.files.push(line.clone());
                     }
                     line.clear();
@@ -62,14 +62,14 @@ impl Config {
 
     /// Creates the configuration file in the given path, doesn't have to include the config file
     /// name(optional)
-    pub fn create_in_path(path: &PathBuf) -> std::result::Result<std::fs::File, std::io::Error> {
+    pub fn create_in_path(path: &Path) -> std::result::Result<std::fs::File, std::io::Error> {
         // Comprobation of folder
-        let mut true_path = PathBuf::new();
+        let mut true_path;
         if !path.is_dir() {
             // if is not a dir, we go to the parent dir
             true_path = path.parent().unwrap().to_path_buf();
         } else {
-            true_path = path.clone();
+            true_path = path.to_path_buf();
         }
 
         // The file path
@@ -139,9 +139,8 @@ impl Config {
         for value in &self.files {
             let mut value = value.clone();
             value.push('\n');
-            match writer.write(value.as_bytes()) {
-                Err(e) => eprintln!("ERROR: {}", e),
-                Ok(_) => {}
+            if let Err(e) = writer.write(value.as_bytes()) {
+                eprintln!("ERROR: {}", e);
             }
         }
     }
@@ -161,7 +160,7 @@ impl Config {
 
     /// Adds a path into the configuration
     // if it exists does nothing
-    pub fn add(&mut self, path: &PathBuf) {
+    pub fn add(&mut self, path: &Path) {
         let path = std::fs::canonicalize(path).expect("Couldn't resolve path");
         let path = path.to_str().expect("A valid path");
         let path = String::from_str(path).expect("A valid path");
@@ -172,18 +171,12 @@ impl Config {
     }
 
     /// Delete a file from the configuration
-    pub fn delete(&mut self, path: &PathBuf) {
-        let index = self
-            .files
-            .iter()
-            .position(|x| Path::new(&x) == path.as_path());
+    pub fn delete(&mut self, path: &Path) {
+        let index = self.files.iter().position(|x| Path::new(&x) == path);
 
-        match index {
-            None => {}
-            Some(i) => {
-                self.files.remove(i);
-            }
-        };
+        if let Some(i) = index {
+            self.files.remove(i);
+        }
     }
 
     /// Returns a copy of the files that stores config
@@ -193,9 +186,9 @@ impl Config {
 
     /// Return the folder where the config file is, needs to be loaded before
     pub fn working_folder(&self) -> Option<PathBuf> {
-        match &self.path {
-            None => None,
-            Some(p) => Some(p.parent().expect("Error in config file").to_path_buf()),
-        }
+        let msg = "Error in config file";
+        self.path
+            .as_ref()
+            .map(|p| p.parent().expect(msg).to_path_buf())
     }
 }
